@@ -4,7 +4,7 @@ import Config
 config :live_view_todo, LiveViewTodo.Repo,
   username: "postgres",
   password: "postgres",
-  hostname: "172.17.0.2",
+  hostname: "172.17.0.3",
   database: "live_view_todo_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,

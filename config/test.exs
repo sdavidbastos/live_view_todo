@@ -8,7 +8,7 @@ import Config
 config :live_view_todo, LiveViewTodo.Repo,
   username: "postgres",
   password: "postgres",
-  hostname: "172.17.0.2",
+  hostname: "172.17.0.3",
   database: "live_view_todo_test#{System.get_env("MIX_TEST_PARTITION")}",
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: 10

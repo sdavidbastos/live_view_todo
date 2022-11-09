@@ -7,7 +7,7 @@ defmodule LiveViewTodoWeb.PageLive do
   def mount(_params, _session, socket) do
     # subscribe to the channel
     if connected?(socket), do: LiveViewTodoWeb.Endpoint.subscribe(@topic)
-    {:ok, assign(socket, items: Item.list_items(), editing: nil)} # add items to assigns
+    {:ok, assign(socket, items: Item.list_items(), editing: nil)}
   end
 
   @impl true
@@ -52,6 +52,13 @@ defmodule LiveViewTodoWeb.PageLive do
   end
 
   @impl true
+  def handle_event("clear-completed", _data, socket) do
+    Item.clear_completed()
+    items = Item.list_items()
+    {:noreply, assign(socket, items: items)}
+  end
+
+  @impl true
   def handle_info(%{event: "update", payload: %{items: items}}, socket) do
     {:noreply, assign(socket, items: items)}
   end
@@ -75,7 +82,7 @@ defmodule LiveViewTodoWeb.PageLive do
   end
 
   def checked?(item) do
-    is_nil(item.status) and item.status > 0
+    not is_nil(item.status) and item.status > 0
   end
 
   def completed?(item) do

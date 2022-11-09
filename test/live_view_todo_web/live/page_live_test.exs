@@ -29,7 +29,7 @@ defmodule LiveViewTodoWeb.PageLiveTest do
     {:ok, item} = Item.create_item(%{"text" => "Learn Elixir"})
     assert item.status == 0
     {:ok, view, _html} = live(conn, "/")
-    assert render_click(view, :delete, %{"id" => item.id}) =~ "Learn Elixir"
+    assert render_click(view, :delete, %{"id" => item.id}) =~ "Todo"
 
     updated_item = Item.get_item!(item.id)
     assert updated_item.status == 2
@@ -54,5 +54,44 @@ defmodule LiveViewTodoWeb.PageLiveTest do
 
     updated_item = Item.get_item!(item.id)
     assert updated_item.text == "Learn more Elixir"
+  end
+
+  test "Filter item", %{conn: conn} do
+    {:ok, item1} = Item.create_item(%{"text" => "Learn Elixir"})
+    {:ok, _item2} = Item.create_item(%{"text" => "Learn Phoenix"})
+
+    {:ok, view, _html} = live(conn, "/")
+    assert render_click(view, :toggle, %{"id" => item1.id, "value" => 1}) =~ "completed"
+
+    # list only completed items
+    {:ok, view, _html} = live(conn, "/?filter_by=completed")
+    assert render(view) =~ "Learn Elixir"
+    refute render(view) =~ "Learn Phoenix"
+
+    # list only active items
+    {:ok, view, _html} = live(conn, "/?filter_by=active")
+    refute render(view) =~ "Learn Elixir"
+    assert render(view) =~ "Learn Phoenix"
+
+    # list all items
+    {:ok, view, _html} = live(conn, "/?filter_by=all")
+    assert render(view) =~ "Learn Elixir"
+    assert render(view) =~ "Learn Phoenix"
+  end
+
+  test "clear completed items", %{conn: conn} do
+    {:ok, item1} = Item.create_item(%{"text" => "Learn Elixir"})
+    {:ok, _item2} = Item.create_item(%{"text" => "Learn Phoenix"})
+
+    # complete item1
+    {:ok, view, _html} = live(conn, "/")
+    assert render(view) =~ "Learn Elixir"
+    assert render(view) =~ "Learn Phoenix"
+
+    assert render_click(view, :toggle, %{"id" => item1.id, "value" => 1})
+
+    view = render_click(view, "clear-completed", %{})
+    assert view =~ "Learn Phoenix"
+    refute view =~ "Learn Elixir"
   end
 end

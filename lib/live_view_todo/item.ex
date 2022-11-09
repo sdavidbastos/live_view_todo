@@ -6,7 +6,7 @@ defmodule LiveViewTodo.Item do
 
   schema "items" do
     field :person_id, :integer
-    field :status, :integer
+    field :status, :integer, default: 0
     field :text, :string
 
     timestamps()
@@ -16,7 +16,7 @@ defmodule LiveViewTodo.Item do
   def changeset(item, attrs) do
     item
     |> cast(attrs, [:text, :person_id, :status])
-    |> validate_required([:text, :person_id, :status])
+    |> validate_required([:text])
   end
 
   @doc """
@@ -81,6 +81,12 @@ defmodule LiveViewTodo.Item do
   def update_item(%Item{} = item, attrs) do
     item
     |> Item.changeset(attrs)
+    |> Repo.update()
+  end
+
+  def delete_item(id) do
+    get_item!(id)
+    |> Item.changeset(%{status: 2})
     |> Repo.update()
   end
 end

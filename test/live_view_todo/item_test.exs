@@ -10,7 +10,6 @@ defmodule LiveViewTodo.ItemTest do
     def item_fixture(attrs \\ %{}) do
       {:ok, item} =
         attrs
-        |> IO.inspect()
         |> Enum.into(@valid_attrs)
         |> Item.create_item()
       item
@@ -45,6 +44,11 @@ defmodule LiveViewTodo.ItemTest do
       item = item_fixture()
       assert {:ok, %Item{} = item} = Item.update_item(item, @update_attrs)
       assert item.text == "some updated text"
+    end
+    test "delete_item/1 soft-deletes an item" do
+      item = item_fixture()
+      assert {:ok, %Item{} = deleted_item} = Item.delete_item(item.id)
+      assert deleted_item.status == 2
     end
   end
 end
